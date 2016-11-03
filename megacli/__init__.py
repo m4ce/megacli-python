@@ -10,6 +10,7 @@ import re
 import subprocess
 
 class MegaCLI:
+
   def __init__(self, cli_path = '/opt/MegaRAID/MegaCli/MegaCli64'):
     self.cli_path = cli_path
 
@@ -24,6 +25,20 @@ class MegaCLI:
       raise RuntimeError('MegaCli returned a non-zero exit code ({0}) - Error: {1}'.format(proc.returncode, err.rstrip()))
     else:
       return [re.sub(':$', '', re.sub('\s*:\s*', ':', re.sub('(^\s*|\s*$)', '', line)).lower()) for line in filter(None, out.rstrip().split("\n"))]
+
+  def __raid_level(self, level):
+    levels = {
+      'primary-0, secondary-0, raid level qualifier-0': 0,
+      'primary-1, secondary-0, raid level qualifier-0': 1,
+      'primary-5, secondary-0, raid level qualifier-3': 5,
+      'primary-6, secondary-0, raid level qualifier-3': 6,
+      'primary-1, secondary-3, raid level qualifier-0': 10,
+    }
+
+    if level in levels:
+      return levels[level]
+    else:
+      return None
 
   def __to_property(self, key, value):
     k = key.replace(' ', '_').replace("'s", '').replace('.', '').replace('/', '_').replace('&', 'and')
@@ -47,6 +62,12 @@ class MegaCLI:
     if m:
       return k, float(m.group(1))
 
+    # deal with temperatures
+    if re.match('.*temperature.*', key):
+      m = re.match('^(\d+)c', value)
+      if m:
+        return k, int(m.group(1))
+
     # deal with sizes
     m = re.match('^(\d+(?:\.\d+)?)\s*(b|kb|mb|gb|tb|pb)', value)
     if m:
@@ -68,7 +89,7 @@ class MegaCLI:
       return k, (size * multiplier)
 
     # deal with times
-    m = re.match('^(\d+)\s*(s|sec|secs|seconds|m|min|mins|minutes|h|hour|hours|d|day|days)', value)
+    m = re.match('^(\d+)\s*(s|sec|secs|seconds|m|min|mins|minutes|h|hour|hours|d|day|days)$', value)
     if m:
       time = int(m.group(1))
       unit = m.group(2)
@@ -104,23 +125,25 @@ class MegaCLI:
           adapter_id = enc['adapter_id']
           continue
 
-        m = re.match('^enclosure (\d+)', line)
-        if m:
-          if 'id' in enc:
-            ret.append(enc)
-            enc = {'adapter_id': adapter_id}
+        if adapter_id is not None:
+          m = re.match('^enclosure (\d+)', line)
+          if m:
+            if 'id' in enc:
+              ret.append(enc)
+              enc = {'adapter_id': adapter_id}
 
-          enc['id'] = int(m.group(1))
-          continue
-
-        fields = line.split(':', 1)
-        if len(fields) > 1:
-          k, v = self.__to_property(*fields)
-
-          if k == 'exit_code':
+            enc['id'] = int(m.group(1))
             continue
 
-          enc[k] = v
+          if 'id' in enc:
+            fields = line.split(':', 1)
+            if len(fields) > 1:
+              k, v = self.__to_property(*fields)
+
+              if k == 'exit_code':
+                continue
+
+              enc[k] = v
 
       if len(enc):
         ret.append(enc)
@@ -138,7 +161,7 @@ class MegaCLI:
       for line in data:
         m = re.match('^adapter (\d+) -- virtual drive information$', line)
         if m:
-          if 'adapter_id' in ld and ld['adapter_id'] != None:
+          if 'adapter_id' in ld:
             ret.append(ld)
             ld = {}
 
@@ -146,23 +169,31 @@ class MegaCLI:
           adapter_id = ld['adapter_id']
           continue
 
-        m = re.match('^virtual drive:(\d+)', line)
-        if m:
-          if 'id' in ld and ld['id'] != None:
-            ret.append(ld)
-            ld = {'adapter_id': adapter_id}
+        if adapter_id is not None:
+          m = re.match('^virtual drive:(\d+)', line)
+          if m:
+            if 'id' in ld:
+              ret.append(ld)
+              ld = {'adapter_id': adapter_id}
 
-          ld['id'] = int(m.group(1))
-          continue
-
-        fields = line.split(':', 1)
-        if len(fields) > 1:
-          k, v = self.__to_property(*fields)
-
-          if k == 'exit_code':
+            ld['id'] = int(m.group(1))
             continue
 
-          ld[k] = v
+          if 'id' in ld:
+            fields = line.split(':', 1)
+            if len(fields) > 1:
+              k, v = self.__to_property(*fields)
+
+              if k == 'exit_code':
+                continue
+
+              if k == 'raid_level':
+                level = self.__raid_level(v)
+                if level is not None:
+                  v = level
+
+              ld[k] = v
+              continue
 
       if len(ld):
         ret.append(ld)
@@ -188,23 +219,25 @@ class MegaCLI:
           adapter_id = pd['adapter_id']
           continue
 
-        m = re.match('^enclosure device id:(\d+)', line)
-        if m:
-          if 'enclosure_id' in pd:
-            ret.append(pd)
-            pd = {'adapter_id': adapter_id}
+        if adapter_id is not None:
+          m = re.match('^enclosure device id:(\d+)', line)
+          if m:
+            if 'enclosure_id' in pd:
+              ret.append(pd)
+              pd = {'adapter_id': adapter_id}
 
-          pd['enclosure_id'] = int(m.group(1))
-          continue
-
-        fields = line.split(':', 1)
-        if len(fields) > 1:
-          k, v = self.__to_property(*fields)
-
-          if k == 'exit_code':
+            pd['enclosure_id'] = int(m.group(1))
             continue
 
-          pd[k] = v
+          if 'enclosure_id' in pd:
+            fields = line.split(':', 1)
+            if len(fields) > 1:
+              k, v = self.__to_property(*fields)
+
+              if k == 'exit_code':
+                continue
+
+              pd[k] = v
 
       if len(pd):
         ret.append(pd)
@@ -216,28 +249,27 @@ class MegaCLI:
 
     data = self.execute("-AdpBbuCmd  -aAll")
     if data:
-      adapter_id = None
       bbu = {}
 
       for line in data:
-        m = re.match('^BBU status for Adapter: (\d+)', line)
+        m = re.match('^bbu status for adapter:(\d+)', line)
         if m:
           if 'adapter_id' in bbu:
             ret.append(bbu)
             bbu = {}
 
           bbu['adapter_id'] = int(m.group(1))
-          adapter_id = bbu['adapter_id']
           continue
 
-        fields = line.split(':', 1)
-        if len(fields) > 1:
-          k, v = self.__to_property(*fields)
+        if 'adapter_id' in bbu:
+          fields = line.split(':', 1)
+          if len(fields) > 1:
+            k, v = self.__to_property(*fields)
 
-          if k == 'exit_code':
-            continue
+            if k == 'exit_code':
+              continue
 
-          bbu[k] = v
+            bbu[k] = v
 
       if len(bbu):
         ret.append(bbu)
@@ -262,14 +294,15 @@ class MegaCLI:
           adapter['id'] = int(m.group(1))
           continue
 
-        fields = line.split(':', 1)
-        if len(fields) > 1:
-          k, v = self.__to_property(*fields)
+        if 'id' in adapter:
+          fields = line.split(':', 1)
+          if len(fields) > 1:
+            k, v = self.__to_property(*fields)
 
-          if k == 'exit_code':
-            continue
+            if k == 'exit_code':
+              continue
 
-          adapter[k] = v
+            adapter[k] = v
 
       if len(adapter):
         ret.append(adapter)
