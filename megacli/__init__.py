@@ -26,7 +26,7 @@ class MegaCLI:
       return [re.sub(':$', '', re.sub('\s*:\s*', ':', re.sub('(^\s*|\s*$)', '', line)).lower()) for line in filter(None, out.rstrip().split("\n"))]
 
   def __to_property(self, key, value):
-    k = key.replace(' ', '_').replace("'s", '').replace('.', '').replace('/', '_')
+    k = key.replace(' ', '_').replace("'s", '').replace('.', '').replace('/', '_').replace('&', 'and')
 
     if value == 'n/a' or value == 'none':
       return k, None
@@ -222,7 +222,7 @@ class MegaCLI:
       for line in data:
         m = re.match('^BBU status for Adapter: (\d+)', line)
         if m:
-          if 'adapter_id' in pd:
+          if 'adapter_id' in bbu:
             ret.append(bbu)
             bbu = {}
 
