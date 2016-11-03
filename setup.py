@@ -12,6 +12,5 @@ setup(
   url = 'https://github.com/m4ce/megacli-python',
   download_url = 'https://github.com/m4ce/megacli-python/tarball/%s' % (version,),
   keywords = ['megacli'],
-  classifiers = [],
-  install_requires = []
+  classifiers = []
 )
