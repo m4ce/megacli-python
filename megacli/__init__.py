@@ -64,7 +64,7 @@ class MegaCLI:
 
     # deal with temperatures
     if re.match('.*temperature.*', key):
-      m = re.match('^(\d+)c', value)
+      m = re.match('^(\d+)\s*(?:c|degree celcius)', value)
       if m:
         return k, int(m.group(1))
 
