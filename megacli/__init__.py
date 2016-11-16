@@ -10,7 +10,6 @@ import re
 import subprocess
 
 class MegaCLI:
-
   def __init__(self, cli_path = '/opt/MegaRAID/MegaCli/MegaCli64'):
     self.cli_path = cli_path
 
@@ -22,7 +21,9 @@ class MegaCLI:
     out, err = proc.communicate()
 
     if proc.returncode:
-      raise RuntimeError('MegaCli returned a non-zero exit code ({0}) - Error: {1}'.format(proc.returncode, err.rstrip()))
+      ex = MegaCLIError(err.rstrip())
+      ex.exitcode = proc.returncode
+      raise ex
     else:
       return [re.sub(':$', '', re.sub('\s*:\s*', ':', re.sub('(^\s*|\s*$)', '', line)).lower()) for line in filter(None, out.rstrip().split("\n"))]
 
