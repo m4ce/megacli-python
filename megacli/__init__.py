@@ -9,6 +9,9 @@ import os
 import re
 import subprocess
 
+class MegaCLIError(Exception):
+  pass
+
 class MegaCLI:
   def __init__(self, cli_path = '/opt/MegaRAID/MegaCli/MegaCli64'):
     self.cli_path = cli_path
