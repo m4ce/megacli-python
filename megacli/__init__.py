@@ -27,8 +27,6 @@ class MegaCLI:
     if isinstance(err, bytes):
       err = err.decode()
 
-    print(out)
-
     if proc.returncode:
       ex = MegaCLIError(err.rstrip())
       ex.exitcode = proc.returncode
