@@ -36,6 +36,6 @@ $(window).resize(function(){
         $("li.nav-item-0 a").text("Top");
     }
     else {
-        $("li.nav-item-0 a").text("megacli-python 0.0.7 documentation");
+        $("li.nav-item-0 a").text("megacli-python 0.0.8 documentation");
     }
 });
