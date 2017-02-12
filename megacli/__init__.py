@@ -20,7 +20,7 @@ class MegaCLI:
       raise RuntimeError('{0} not found'.format(cli_path))
 
   def execute(self, cmd):
-    proc = subprocess.Popen("{0} {1}".format(self.cli_path, cmd), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    proc = subprocess.Popen("{0} {1} -NoLog".format(self.cli_path, cmd), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
     if isinstance(out, bytes):
       out = out.decode()
@@ -317,29 +317,119 @@ class MegaCLI:
 
     return ret
 
-  def createld(self, raidlevel, devices, adapter, otherargs = ''):
-    #devices should be an array of strings, ['enclosure_id:device_id']
-    #adapter should be a number (will be cast to string)
-    #otherargs should be general MegaCli arguments such as WT, NORA, Direct, etc.  example: 'WT RA CachedBadBBU'
-    pds = '['
+  def create_ld(self, raid_level, devices, adapter, write_policy = None, read_policy = None, cache_policy = None, cached_bad_bbu = None, size = None, stripe_size = None, hot_spares = [], after_ld = None, force = False):
+    """
+    Create a new logical drive
+    @param raid_level: type string, specifies the RAID level. Valid arguments: 0, 1, 5 or 6.
+    @param devices: type list, specifies the drive enclosures and slot numbers to construct the drive group. E.g.: ['E0:S1', E1:S1, ..]
+    @param write_policy: type string, specifies the device write policy. Valid arguments: WT (write through) or WB (write back)
+    @param read_policy: type string, specifies the device read policy. Valid arguments: NORA (no read ahead), RA (read ahead), ADRA (adaptive read ahead).
+    @param cache_policy: type string, specifies the device cache policy. Valid arguments: Direct, Cached.
+    @param cached_bad_bbu: type bool, specifies whether to use write cache when BBU is bad.
+    @param size: type int, specifies the capacity for the virtual drive in MB.
+    @param stripe_size: type int, specifies the stripe size. Valid arguments: 8, 16, 32, 64, 128, 256, 512, or 1024.
+    @param hot_spares: type list, specifies the device hot spares. E.g.: ['E5:S5', ..]
+    @param after_ld: type string, specifies which free slot should be used.
+    @param force: type bool, whether to force or not the creation of the logical device
+    """
+    cmd = []
 
-    for device in devices:
-      pds = pds + device + ','
-
-    pds = pds[:-1] + ']'
-
-    data = self.execute("-CfgLDAdd -R" + str(raidlevel) + " " + pds + " " + otherargs + " -a" + str(adapter))
-
-    return data #No restructuring of data required, just return it
-
-  def removeld(self, device, adapter, force=False):
-    #device should be a number (will be cast to string)
-    #adapter should be a number (will be cast to string)
-
-    if not force:
-      data = self.execute("-CfgLdDel -L" + str(device) + " -a" + str(adapter))
+    if isinstance(raid_level, int):
+      if raid_level not in [0, 1, 5, 6]:
+        raise ValueError("Logical drive's RAID level must be one of 0, 1, 5 or 6")
     else:
-      data = self.execute("-CfgLdDel -L" + str(device) + " -Force -a" + str(adapter))
+      raise ValueError("Logical drive's RAID level must be type int")
 
-    return data #No restructuring of data required, just return it
+    if not isinstance(devices, list):
+      raise ValueError("Logical drive's devices must be type list")
+
+    cmd.append("-R{0}[{1}]".format(raid_level, ','.join(devices)))
+
+    if isinstance(adapter, int):
+      cmd.append('-a{0}'.format(adapter))
+    else:
+      raise ValueError("Logical drive's adapter ID must be type int")
+
+    if write_policy:
+      if write_policy not in ['WT', 'WB']:
+        raise ValueError("Logical drive's write policy must be either WT (write through) or WB (write back)")
+      else:
+        cmd.append(write_policy)
+
+    if read_policy:
+      if read_policy not in ['NORA', 'RA', 'ADRA']:
+        raise ValueError("Logical drive's read policy must be one of NORA (no read ahead), RA (read ahead) or ADRA (adaptive read ahead)")
+      else:
+        cmd.append(read_policy)
+
+    if cache_policy:
+      if cache_policy not in ['Direct', 'Cached']:
+        raise ValueError("Logical drive's cache policy can be either Direct or Cached")
+      else:
+        cmd.append(cache_policy)
+
+    if cached_bad_bbu is not None:
+      if isinstance(cached_bad_bbu, bool):
+        if cached_bad_bbu:
+          cmd.append('CachedBadBBU')
+        else:
+          cmd.append('NoCachedBadBBU')
+      else:
+        raise ValueError("Logical drive's cached bad bbu flag must be type bool")
+
+    if size:
+      if isinstance(size, int):
+        cmd.append("-sz{0}".format(size))
+      else:
+        raise ValueError("Logical drive's size must be type int")
+
+    if stripe_size:
+      if isinstance(stripe_size, int):
+        if stripe_size in [8, 16, 32, 64, 128, 256, 512, 1024]:
+          cmd.append("-strpsz{0}".format(stripe_size))
+        else:
+          raise ValueError("Logical drive's stripe size must be one of 8, 16, 32, 64, 128, 256, 512, 1024")
+      else:
+        raise ValueError("Logical drive's stripe size must be type int")
+
+    if isinstance(hot_spares, list):
+      if len(hot_spares) > 0:
+        cmd.append("-Hsp[{0}]".format(','.join(hot_spares)))
+    else:
+      raise ValueError("Logical drive's hot spares must be type list")
+
+    if after_ld:
+      cmd.append("-afterLd {0}".format(after_ld))
+
+    if isinstance(force, bool):
+      if force:
+        cmd.append('-Force')
+    else:
+      raise ValueError("Logical drive's force flag must be type bool")
+
+    return self.execute("-CfgLDAdd {0}".format(' '.join(cmd)))
+
+  def remove_ld(self, drive, adapter, force = False):
+    """
+    Delete a logical drive
+    @param drive: type int, specifies the drive to remove
+    @param adapter: type int, specifies the drive's controller
+    @param force: type bool, specifies whether to force or not the removal of the drive
+    """
+    cmd = []
+
+    cmd.append("-L{0}".format(device))
+
+    if isinstance(adapter, int):
+      cmd.append('-a{0}'.format(adapter))
+    else:
+      raise ValueError("Logical drive's adapter ID must be type int")
+
+    if isinstance(force, bool):
+      if force:
+        cmd.append('-Force')
+    else:
+      raise ValueError("Logical drive's force flag must be type bool")
+
+    return self.execute("-CfgLdDel {0}".format(' '.join(cmd)))
 
