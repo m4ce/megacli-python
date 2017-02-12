@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-#
-# __init__.py
-#
-# Author: Matteo Cerutti <matteo.cerutti@hotmail.co.uk>
-#
+"""
+Python library for MegaCli
+
+This is a simple Python library that wraps around MegaCli to provide an OO interface.
+"""
 
 import os
 import re
@@ -17,7 +17,8 @@ class MegaCLI:
     """
     Construct a new 'MegaCLI' object
 
-    :param cli_path: path to MegaCli executable (default: /opt/MegaRAID/MegaCli/MegaCli64)
+    :param cli_path: path to MegaCli executable
+    :type cli_path: string
     :return: nothing
     """
     self.cli_path = cli_path
@@ -30,7 +31,9 @@ class MegaCLI:
     Execute a MegaCLI command
 
     :param cmd: command line arguments for MegaCLI
+    :type cmd: string
     :return: MegaCLI command output
+    :rtype: int
     """
     proc = subprocess.Popen("{0} {1} -NoLog".format(self.cli_path, cmd), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
@@ -50,8 +53,10 @@ class MegaCLI:
     """
     Map a RAID level string to a RAID level integer
 
-    :param level: text RAID level
-    :return: integer RAID level
+    :param level: RAID level
+    :type level: string
+    :return: RAID level
+    :rtype: int
     """
 
     levels = {
@@ -72,7 +77,9 @@ class MegaCLI:
     Decode raw MegaCLI key value pairs into properties
 
     :param key: raw property name
+    :type key: string
     :param value: raw property value
+    :type value: string
     :return: decoded property name and value
     """
     k = key.replace(' ', '_').replace("'s", '').replace('.', '').replace('/', '_').replace('&', 'and')
@@ -145,6 +152,7 @@ class MegaCLI:
     Get enclosures
 
     :return: a list of all available enclosures
+    :rtype: list
     """
     ret = []
 
@@ -194,6 +202,7 @@ class MegaCLI:
     Get logical drives
 
     :return: a list of all configured logical drives
+    :rtype: list
     """
     ret = []
 
@@ -249,6 +258,7 @@ class MegaCLI:
     Get physical drives
 
     :return: a list of all installed physical drives
+    :rtype: list
     """
     ret = []
 
@@ -298,6 +308,7 @@ class MegaCLI:
     Get battery backup units
 
     :return: a list of all installed BBUs
+    :rtype: list
     """
     ret = []
 
@@ -335,6 +346,7 @@ class MegaCLI:
     Get MegaRAID adapters
 
     :return: a list of all installed MegaRAID adapters
+    :rtype: list
     """
     ret = []
 
@@ -347,7 +359,7 @@ class MegaCLI:
         m = re.match('^adapter #(\d+)', line)
         if m:
           if 'id' in adapter:
-            ret.append(adapter)a
+            ret.append(adapter)
             adapter = {}
 
           adapter['id'] = int(m.group(1))
@@ -372,18 +384,30 @@ class MegaCLI:
     """
     Create a new logical drive
 
-    :param raid_level: type string, specifies the RAID level. Valid arguments: 0, 1, 5 or 6.
-    :param devices: type list, specifies the drive enclosures and slot numbers to construct the drive group. E.g.: ['E0:S1', E1:S1, ..]
-    :param write_policy: type string, specifies the device write policy. Valid arguments: WT (write through) or WB (write back)
-    :param read_policy: type string, specifies the device read policy. Valid arguments: NORA (no read ahead), RA (read ahead), ADRA (adaptive read ahead).
-    :param cache_policy: type string, specifies the device cache policy. Valid arguments: Direct, Cached.
-    :param cached_bad_bbu: type bool, specifies whether to use write cache when BBU is bad.
-    :param size: type int, specifies the capacity for the virtual drive in MB.
-    :param stripe_size: type int, specifies the stripe size. Valid arguments: 8, 16, 32, 64, 128, 256, 512, or 1024.
-    :param hot_spares: type list, specifies the device hot spares. E.g.: ['E5:S5', ..]
-    :param after_ld: type string, specifies which free slot should be used.
-    :param force: type bool, whether to force or not the creation of the logical device
+    :param raid_level: specifies the RAID level. Valid arguments: 0, 1, 5 or 6.
+    :type raid_level: int
+    :param devices: specifies the drive enclosures and slot numbers to construct the drive group. E.g.: ['E0:S1', E1:S1, ..]
+    :type devices: list
+    :param write_policy: specifies the device write policy. Valid arguments: WT (write through) or WB (write back)
+    :type write_policy: string
+    :param read_policy: specifies the device read policy. Valid arguments: NORA (no read ahead), RA (read ahead), ADRA (adaptive read ahead).
+    :type read_policy: string
+    :param cache_policy: specifies the device cache policy. Valid arguments: Direct, Cached.
+    :type cache_policy: string
+    :param cached_bad_bbu: specifies whether to use write cache when BBU is bad.
+    :type cached_bad_bbu: bool
+    :param size: specifies the capacity for the virtual drive in MB.
+    :type size: int
+    :param stripe_size: specifies the stripe size. Valid arguments: 8, 16, 32, 64, 128, 256, 512, or 1024.
+    :type stripe_size: int
+    :param hot_spares: specifies the device hot spares. E.g.: ['E5:S5', ..]
+    :type hot_spares: list
+    :param after_ld: specifies which free slot should be used.
+    :type after_ld: string
+    :param force: whether to force or not the creation of the logical drive
+    :type force: bool
     :return: MegaCLI command output
+    :rtype: string
     """
     cmd = []
 
@@ -466,10 +490,14 @@ class MegaCLI:
     """
     Delete a logical drive
 
-    :param drive: type int, specifies the drive to remove
-    :param adapter: type int, specifies the drive's controller
-    :param force: type bool, specifies whether to force or not the removal of the drive
+    :param drive: specifies the drive to remove
+    :type drive: string
+    :param adapter: specifies the drive's controller
+    :type adapter: int
+    :param force: specifies whether to force or not the removal of the drive
+    :type force: bool
     :return: MegaCLI command output
+    :rtype: string
     """
     cmd = []
 
