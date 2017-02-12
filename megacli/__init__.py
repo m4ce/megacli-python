@@ -22,6 +22,10 @@ class MegaCLI:
   def execute(self, cmd):
     proc = subprocess.Popen("{0} {1}".format(self.cli_path, cmd), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
+    if isinstance(out, bytes):
+      out = out.decode()
+    if isinstance(err, bytes):
+      err = err.decode()
 
     if proc.returncode:
       ex = MegaCLIError(err.rstrip())
@@ -312,3 +316,30 @@ class MegaCLI:
         ret.append(adapter)
 
     return ret
+
+  def createld(self, raidlevel, devices, adapter, otherargs = ''):
+    #devices should be an array of strings, ['enclosure_id:device_id']
+    #adapter should be a number (will be cast to string)
+    #otherargs should be general MegaCli arguments such as WT, NORA, Direct, etc.  example: 'WT RA CachedBadBBU'
+    pds = '['
+
+    for device in devices:
+      pds = pds + device + ','
+
+    pds = pds[:-1] + ']'
+
+    data = self.execute("-CfgLDAdd -R" + str(raidlevel) + " " + pds + " " + otherargs + " -a" + str(adapter))
+
+    return data #No restructuring of data required, just return it
+
+  def removeld(self, device, adapter, force=False):
+    #device should be a number (will be cast to string)
+    #adapter should be a number (will be cast to string)
+
+    if not force:
+      data = self.execute("-CfgLdDel -L" + str(device) + " -a" + str(adapter))
+    else:
+      data = self.execute("-CfgLdDel -L" + str(device) + " -Force -a" + str(adapter))
+
+    return data #No restructuring of data required, just return it
+
