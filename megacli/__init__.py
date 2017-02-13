@@ -386,7 +386,7 @@ class MegaCLI:
 
     :param raid_level: specifies the RAID level. Valid arguments: 0, 1, 5 or 6.
     :type raid_level: int
-    :param devices: specifies the drive enclosures and slot numbers to construct the drive group. E.g.: ['E0:S1', E1:S1, ..]
+    :param devices: specifies the drive enclosures and slot numbers to construct the drive group. E.g.: ['E0:S0', 'E1:S1', ...]
     :type devices: list
     :param write_policy: specifies the device write policy. Valid arguments: WT (write through) or WB (write back)
     :type write_policy: string
@@ -421,11 +421,6 @@ class MegaCLI:
       raise ValueError("Logical drive's devices must be type list")
 
     cmd.append("-R{0}[{1}]".format(raid_level, ','.join(devices)))
-
-    if isinstance(adapter, int):
-      cmd.append('-a{0}'.format(adapter))
-    else:
-      raise ValueError("Logical drive's adapter ID must be type int")
 
     if write_policy:
       if write_policy not in ['WT', 'WB']:
@@ -484,6 +479,11 @@ class MegaCLI:
     else:
       raise ValueError("Logical drive's force flag must be type bool")
 
+    if isinstance(adapter, int):
+      cmd.append('-a{0}'.format(adapter))
+    else:
+      raise ValueError("Logical drive's adapter ID must be type int")
+
     return self.execute("-CfgLDAdd {0}".format(' '.join(cmd)))
 
   def remove_ld(self, drive, adapter, force = False):
@@ -501,18 +501,18 @@ class MegaCLI:
     """
     cmd = []
 
-    cmd.append("-L{0}".format(device))
-
-    if isinstance(adapter, int):
-      cmd.append('-a{0}'.format(adapter))
-    else:
-      raise ValueError("Logical drive's adapter ID must be type int")
+    cmd.append("-L{0}".format(drive))
 
     if isinstance(force, bool):
       if force:
         cmd.append('-Force')
     else:
       raise ValueError("Logical drive's force flag must be type bool")
+
+    if isinstance(adapter, int):
+      cmd.append('-a{0}'.format(adapter))
+    else:
+      raise ValueError("Logical drive's adapter ID must be type int")
 
     return self.execute("-CfgLdDel {0}".format(' '.join(cmd)))
 
