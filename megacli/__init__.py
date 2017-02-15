@@ -516,3 +516,47 @@ class MegaCLI:
 
     return self.execute("-CfgLdDel {0}".format(' '.join(cmd)))
 
+  def clear_foreign(self, adapter):
+    """
+    Clear foreign configs from an adapter
+
+    :param adapter: specifies the foreign config's controller
+    :type adapter: int
+    :return: MegaCLI command output
+    :rtype: string
+    """
+
+    cmd = []
+
+    if isinstance(adapter, int):
+      cmd.append("-a{0}".format(adapter))
+    else:
+      raise ValueError("Foreign config's adapter ID must be type int")
+
+    return self.execute("-CfgForeign -Clear {0}".format(' '.join(cmd)))
+
+  def make_pd_good(self, drive, adapter):
+    """
+    Set a drive from 'bad' to 'unconfigured, good'
+
+
+    :param drive: specifies the enclosure:drive to set to 'good'
+    :type drive: string
+    :param adapter: specifies the drive's controller
+    :type adapter: int
+    :return: MegaCLI command output
+    :rtype: string
+    """
+
+    cmd = []
+
+    cmd.append("-PhysDrv [{0}]".format(drive))
+
+    if isinstance(adapter, int):
+      cmd.append("-a{0}".format(adapter))
+    else:
+      raise ValueError("Drive's adapter ID must be type int")
+
+    return self.execute("-PDMakeGood {0}".format(' '.join(cmd)))
+
+
