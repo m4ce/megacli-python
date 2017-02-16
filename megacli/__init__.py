@@ -559,7 +559,7 @@ class MegaCLI:
 
     return self.execute("-PDMakeGood {0}".format(' '.join(cmd)))
 
-  def init_ld(self, drive, adapter, full = False):
+  def start_init(self, drive, adapter, full = False):
     """
     Initializes a logical drive
 
