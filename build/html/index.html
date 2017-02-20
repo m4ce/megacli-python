@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to megacli-python’s documentation! &#8212; megacli-python 0.0.8 documentation</title>
+    <title>Welcome to megacli-python’s documentation! &#8212; megacli-python 0.0.10 documentation</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.8',
+        VERSION:     '0.0.10',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">megacli-python 0.0.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">megacli-python 0.0.10 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -121,6 +121,38 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="megacli.MegaCLI.check_init">
+<code class="descname">check_init</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.check_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns initialization status of a logical drive
+:param drive: specifies the logical drive to check
+:type drive: string
+:param adapter: specifies the drive&#8217;s controller
+:type adapter: int
+:param full: specifies whether to do a full initialize
+:type full: bool
+:return: MegaCLI command output
+:rtype: string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="megacli.MegaCLI.clear_foreign">
+<code class="descname">clear_foreign</code><span class="sig-paren">(</span><em>adapter</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.clear_foreign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear foreign configs from an adapter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>adapter</strong> (<em>int</em>) &#8211; specifies the foreign config&#8217;s controller</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">MegaCLI command output</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="megacli.MegaCLI.create_ld">
 <code class="descname">create_ld</code><span class="sig-paren">(</span><em>raid_level</em>, <em>devices</em>, <em>adapter</em>, <em>write_policy=None</em>, <em>read_policy=None</em>, <em>cache_policy=None</em>, <em>cached_bad_bbu=None</em>, <em>size=None</em>, <em>stripe_size=None</em>, <em>hot_spares=[]</em>, <em>after_ld=None</em>, <em>force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.create_ld" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new logical drive</p>
@@ -130,7 +162,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>raid_level</strong> (<em>int</em>) &#8211; specifies the RAID level. Valid arguments: 0, 1, 5 or 6.</li>
-<li><strong>devices</strong> (<em>list</em>) &#8211; specifies the drive enclosures and slot numbers to construct the drive group. E.g.: [&#8216;E0:S1&#8217;, E1:S1, ..]</li>
+<li><strong>devices</strong> (<em>list</em>) &#8211; specifies the drive enclosures and slot numbers to construct the drive group. E.g.: [&#8216;E0:S0&#8217;, &#8216;E1:S1&#8217;, ...]</li>
 <li><strong>write_policy</strong> (<em>string</em>) &#8211; specifies the device write policy. Valid arguments: WT (write through) or WB (write back)</li>
 <li><strong>read_policy</strong> (<em>string</em>) &#8211; specifies the device read policy. Valid arguments: NORA (no read ahead), RA (read ahead), ADRA (adaptive read ahead).</li>
 <li><strong>cache_policy</strong> (<em>string</em>) &#8211; specifies the device cache policy. Valid arguments: Direct, Cached.</li>
@@ -204,6 +236,30 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="megacli.MegaCLI.make_pd_good">
+<code class="descname">make_pd_good</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.make_pd_good" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a drive from &#8216;bad&#8217; to &#8216;unconfigured, good&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>drive</strong> (<em>string</em>) &#8211; specifies the enclosure:drive to set to &#8216;good&#8217;</li>
+<li><strong>adapter</strong> (<em>int</em>) &#8211; specifies the drive&#8217;s controller</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">MegaCLI command output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="megacli.MegaCLI.physicaldrives">
 <code class="descname">physicaldrives</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.physicaldrives" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get physical drives</p>
@@ -228,7 +284,7 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>drive</strong> (<em>string</em>) &#8211; specifies the drive to remove</li>
+<li><strong>drive</strong> (<em>int</em>) &#8211; specifies the drive to remove</li>
 <li><strong>adapter</strong> (<em>int</em>) &#8211; specifies the drive&#8217;s controller</li>
 <li><strong>force</strong> (<em>bool</em>) &#8211; specifies whether to force or not the removal of the drive</li>
 </ul>
@@ -242,6 +298,34 @@
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="megacli.MegaCLI.start_init">
+<code class="descname">start_init</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em>, <em>full=False</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.start_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a logical drive
+:param drive: specifies the logical drive to initialize
+:type drive: string
+:param adapter: specifies the drive&#8217;s controller
+:type adapter: int
+:param full: specifies whether to do a full initialize
+:type full: bool
+:return: MegaCLI command output
+:rtype: string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="megacli.MegaCLI.stop_init">
+<code class="descname">stop_init</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.stop_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops initialization on a logical drive
+:param drive: specifies the logical drive to stop initializion
+:type drive: string
+:param adapter: specifies the drive&#8217;s controller
+:type adapter: int
+:param full: specifies whether to do a full initialize
+:type full: bool
+:return: MegaCLI command output
+:rtype: string</p>
 </dd></dl>
 
 </dd></dl>
@@ -271,7 +355,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">megacli-python 0.0.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">megacli-python 0.0.10 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
