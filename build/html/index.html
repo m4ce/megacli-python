@@ -123,15 +123,26 @@
 <dl class="method">
 <dt id="megacli.MegaCLI.check_init">
 <code class="descname">check_init</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.check_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns initialization status of a logical drive
-:param drive: specifies the logical drive to check
-:type drive: string
-:param adapter: specifies the drive&#8217;s controller
-:type adapter: int
-:param full: specifies whether to do a full initialize
-:type full: bool
-:return: MegaCLI command output
-:rtype: string</p>
+<dd><p>Returns initialization status of a logical drive</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>drive</strong> (<em>string</em>) &#8211; specifies the logical drive to check</li>
+<li><strong>adapter</strong> (<em>int</em>) &#8211; specifies the drive&#8217;s controller</li>
+<li><strong>full</strong> (<em>bool</em>) &#8211; specifies whether to do a full initialize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">MegaCLI command output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -303,29 +314,51 @@
 <dl class="method">
 <dt id="megacli.MegaCLI.start_init">
 <code class="descname">start_init</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em>, <em>full=False</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.start_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a logical drive
-:param drive: specifies the logical drive to initialize
-:type drive: string
-:param adapter: specifies the drive&#8217;s controller
-:type adapter: int
-:param full: specifies whether to do a full initialize
-:type full: bool
-:return: MegaCLI command output
-:rtype: string</p>
+<dd><p>Initializes a logical drive</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>drive</strong> (<em>string</em>) &#8211; specifies the logical drive to initialize</li>
+<li><strong>adapter</strong> (<em>int</em>) &#8211; specifies the drive&#8217;s controller</li>
+<li><strong>full</strong> (<em>bool</em>) &#8211; specifies whether to do a full initialize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">MegaCLI command output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="megacli.MegaCLI.stop_init">
 <code class="descname">stop_init</code><span class="sig-paren">(</span><em>drive</em>, <em>adapter</em><span class="sig-paren">)</span><a class="headerlink" href="#megacli.MegaCLI.stop_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stops initialization on a logical drive
-:param drive: specifies the logical drive to stop initializion
-:type drive: string
-:param adapter: specifies the drive&#8217;s controller
-:type adapter: int
-:param full: specifies whether to do a full initialize
-:type full: bool
-:return: MegaCLI command output
-:rtype: string</p>
+<dd><p>Stops initialization on a logical drive</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>drive</strong> (<em>string</em>) &#8211; specifies the logical drive to stop initializion</li>
+<li><strong>adapter</strong> (<em>int</em>) &#8211; specifies the drive&#8217;s controller</li>
+<li><strong>full</strong> (<em>bool</em>) &#8211; specifies whether to do a full initialize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">MegaCLI command output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
