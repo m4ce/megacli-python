@@ -539,7 +539,6 @@ class MegaCLI:
     """
     Set a drive from 'bad' to 'unconfigured, good'
 
-
     :param drive: specifies the enclosure:drive to set to 'good'
     :type drive: string
     :param adapter: specifies the drive's controller
@@ -562,6 +561,7 @@ class MegaCLI:
   def start_init(self, drive, adapter, full = False):
     """
     Initializes a logical drive
+
     :param drive: specifies the logical drive to initialize
     :type drive: string
     :param adapter: specifies the drive's controller
@@ -594,6 +594,7 @@ class MegaCLI:
   def check_init(self, drive, adapter):
     """
     Returns initialization status of a logical drive
+
     :param drive: specifies the logical drive to check
     :type drive: string
     :param adapter: specifies the drive's controller
@@ -620,6 +621,7 @@ class MegaCLI:
   def stop_init(self, drive, adapter):
     """
     Stops initialization on a logical drive
+
     :param drive: specifies the logical drive to stop initializion
     :type drive: string
     :param adapter: specifies the drive's controller
