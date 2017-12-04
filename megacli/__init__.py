@@ -279,13 +279,13 @@ class MegaCLI:
           continue
 
         if adapter_id is not None:
-          m = re.match('^enclosure device id:(\d+)', line)
+          m = re.match('^enclosure device id:(\d+|n\/a)', line)
           if m:
             if 'enclosure_id' in pd:
               ret.append(pd)
               pd = {'adapter_id': adapter_id}
 
-            pd['enclosure_id'] = int(m.group(1))
+            pd['enclosure_id'] = int(m.group(1)) if m.group(1) != "n/a" else 0
             continue
 
           if 'enclosure_id' in pd:
