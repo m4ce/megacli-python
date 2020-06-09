@@ -384,7 +384,7 @@ class MegaCLI:
     """
     Create a new logical drive
 
-    :param raid_level: specifies the RAID level. Valid arguments: 0, 1, 5 or 6.
+    :param raid_level: specifies the RAID level. Valid arguments: 0, 1, 5, 6 or 10.
     :type raid_level: int
     :param devices: specifies the drive enclosures and slot numbers to construct the drive group. E.g.: ['E0:S0', 'E1:S1', ...]
     :type devices: list
@@ -412,15 +412,26 @@ class MegaCLI:
     cmd = []
 
     if isinstance(raid_level, int):
-      if raid_level not in [0, 1, 5, 6]:
-        raise ValueError("Logical drive's RAID level must be one of 0, 1, 5 or 6")
+      if raid_level not in [0, 1, 5, 6, 10]:
+        raise ValueError("Logical drive's RAID level must be one of 0, 1, 5, 6 or 10")
     else:
       raise ValueError("Logical drive's RAID level must be type int")
 
     if not isinstance(devices, list):
       raise ValueError("Logical drive's devices must be type list")
 
-    cmd.append("-R{0}[{1}]".format(raid_level, ','.join(devices)))
+    if raid_level == 10:
+      if len(devices) % 2:
+        raise ValueError("RAID 10 must consist of an even number of devices")
+      if len(devices) < 4:
+        raise ValueError("RAID 10 must consist of at least 4 devices")
+
+      cmd.append("-CfgSpanAdd -R{0}".format(raid_level))
+
+      for i, d in zip(range(0, len(devices) // 2), range(0, len(devices), 2)):
+        cmd.append("-Array{0}[{1}]".format(i, ','.join(devices[d:d + 2])))
+    else:
+      cmd.append("-CfgLdAdd -R{0}[{1}]".format(raid_level, ','.join(devices)))
 
     if write_policy:
       if write_policy not in ['WT', 'WB']:
@@ -484,7 +495,7 @@ class MegaCLI:
     else:
       raise ValueError("Logical drive's adapter ID must be type int")
 
-    return self.execute("-CfgLDAdd {0}".format(' '.join(cmd)))
+    return self.execute(' '.join(cmd))
 
   def remove_ld(self, drive, adapter, force = False):
     """
