@@ -37,10 +37,12 @@ class MegaCLI:
     """
     proc = subprocess.Popen("{0} {1} -NoLog".format(self.cli_path, cmd), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
-    if isinstance(out, bytes):
+
+    # MegaCLI sends errors to stdout, not stderr.
+    if proc.returncode and isinstance(err, bytes):
+      err = out.decode(errors="ignore")
+    elif isinstance(out, bytes):
       out = out.decode(errors="ignore")
-    if isinstance(err, bytes):
-      err = err.decode(errors="ignore")
 
     if proc.returncode:
       ex = MegaCLIError(err.rstrip())
